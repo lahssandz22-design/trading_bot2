@@ -17,10 +17,236 @@ import requests
 TELEGRAM_BOT_TOKEN = "8872543456:AAFfbiuKXkZsity3lhfE7e7N2jg2aMfsDRI"
 AUTHORIZED_CHAT_ID = "7895743860"
 
+# قائمة موسعة تضم 200 زوج (عملات رقمية وأزواج فوركس وقوة تدفق مختلفة)
 SYMBOLS = [
-    "BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT",
-    "ADAUSDT", "AVAXUSDT", "DOGEUSDT", "DOTUSDT", "LINKUSDT",
-    "NEARUSDT", "MATICUSDT", "LTCUSDT", "UNIUSDT", "FILUSDT"
+    # --- العملات الرقمية الكبرى (Major Crypto) ---
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "BNBUSDT",
+    "XRPUSDT",
+    "ADAUSDT",
+    "AVAXUSDT",
+    "DOGEUSDT",
+    "DOTUSDT",
+    "LINKUSDT",
+    "NEARUSDT",
+    "MATICUSDT",
+    "LTCUSDT",
+    "UNIUSDT",
+    "FILUSDT",
+    "ATOMUSDT",
+    "ETCUSDT",
+    "XLMUSDT",
+    "BCHUSDT",
+    "APTUSDT",
+    "SUIUSDT",
+    "ARBUSDT",
+    "OPUSDT",
+    "INJUSDT",
+    "RNDRUSDT",
+    "TIAUSDT",
+    "SEIUSDT",
+    "FETUSDT",
+    "AGIXUSDT",
+    "RENDERUSDT",
+    # --- العملات الرقمية متوسطة وقوية العزم (Altcoins & Mid-cap) ---
+    "PEPEUSDT",
+    "SHIBUSDT",
+    "FLOKIUSDT",
+    "BONKUSDT",
+    "WIFUSDT",
+    "ARUSDT",
+    "IMXUSDT",
+    "SANDUSDT",
+    "MANAUSDT",
+    "AXSUSDT",
+    "GALAUSDT",
+    "CHZUSDT",
+    "CRVUSDT",
+    "AAVEUSDT",
+    "MKRUSDT",
+    "SNXUSDT",
+    "COMPUSDT",
+    "LDOUSDT",
+    "RUNEUSDT",
+    "KASUSDT",
+    "STXUSDT",
+    "ICPUSDT",
+    "ALGOUSDT",
+    "FTMUSDT",
+    "HBARUSDT",
+    "VETUSDT",
+    "THETAUSDT",
+    "EGLDUSDT",
+    "EOSUSDT",
+    "XTZUSDT",
+    "KAVAUSDT",
+    "ZILUSDT",
+    "BATUSDT",
+    "ENJUSDT",
+    "ZRXUSDT",
+    "IOSTUSDT",
+    "ONTUSDT",
+    "QTUMUSDT",
+    "JUPUSDT",
+    "PYTHUSDT",
+    "PENDLEUSDT",
+    "OMUSDT",
+    "ONDOUSDT",
+    "CYBERUSDT",
+    "MEMEUSDT",
+    "BOMEUSDT",
+    "POLUSDT",
+    "STRKUSDT",
+    "PORTALUSDT",
+    "ALTUSDT",
+    "PIXELUSDT",
+    "ACEUSDT",
+    "NFPUSDT",
+    "AIUSDT",
+    "XAIUSDT",
+    "MANTAUSDT",
+    "ZETAUSDT",
+    "DYMUSDT",
+    "JTOUSDT",
+    "BLURUSDT",
+    "ORDIUSDT",
+    "SATSUSDT",
+    "RATSUSDT",
+    "BEAMXUSDT",
+    "MAVUSDT",
+    "PENDLEUSDT",
+    "SSVUSDT",
+    "CFXUSDT",
+    "ACHUSDT",
+    "HIFIUSDT",
+    "ARKMUSDT",
+    "IDUSDT",
+    "EDUUSDT",
+    "COMBOUSDT",
+    "JOEUSDT",
+    "GMXUSDT",
+    "LUNA2USDT",
+    "USTCUSDT",
+    "POLYXUSDT",
+    "BCHUSDT",
+    "TRXUSDT",
+    "XEMUSDT",
+    "IOUSDT",
+    "ZKUSDT",
+    "REZUSDT",
+    "BBUSDT",
+    "NOTUSDT",
+    "TNSRUSDT",
+    "SAGAUSDT",
+    "ENAUSDT",
+    "WUSDT",
+    "ETHFIUSDT",
+    "BOMEUSDT",
+    "AEVOUSDT",
+    "PORTALUSDT",
+    "PIXELUSDT",
+    "ALTUSDT",
+    "MANTAUSDT",
+    "JUPUSDT",
+    "PYTHUSDT",
+    "DIMOUSDT",
+    "PONKEUSDT",
+    "MEWUSDT",
+    "SLERFUSDT",
+    "BENDOGUSDT",
+    "PRIMEUSDT",
+    "SUPERUSDT",
+    "TOKENUSDT",
+    "PROMUSDT",
+    "QIUSDT",
+    "OXTUSDT",
+    "C98USDT",
+    "CLVUSDT",
+    "COTIUSDT",
+    "DODOUSDT",
+    "FIDAUSDT",
+    "FRONTUSDT",
+    "GTCUSDT",
+    "HFTUSDT",
+    "HIGHUSDT",
+    "ILVUSDT",
+    "LITUSDT",
+    "LOKAUSDT",
+    "MCUSDT",
+    "MDBUSDT",
+    "MTLUSDT",
+    "NKNUSDT",
+    "OGNUSDT",
+    "PONDUSDT",
+    "QKCUSDT",
+    "RADUSDT",
+    "RAMPUSDT",
+    "REEFUSDT",
+    "RFUSDT",
+    "RLCUSDT",
+    "ROSEUSDT",
+    "SPAUSDT",
+    "SPELLUSDT",
+    "SRMUSDT",
+    "STGUSDT",
+    "SUNUSDT",
+    "SUPERUSDT",
+    "SYSUSDT",
+    "T_USDT",
+    "TLMUSDT",
+    "TRUUSDT",
+    "TURBOUSDT",
+    "UFTUSDT",
+    "UNFIUSDT",
+    "VIDTUSDT",
+    "VOXELUSDT",
+    "WANUSDT",
+    "WAXPUSDT",
+    "WNXMUSDT",
+    "WOOUSDT",
+    "XVSUSDT",
+    "YFIUSDT",
+    "YGGUSDT",
+    "ZENUSDT",
+    "GNSUSDT",
+    "POLSUSDT",
+    "PERPUSDT",
+    "MOVRUSDT",
+    "GLMRUSDT",
+    "BICOUSDT",
+    "FLUXUSDT",
+    "COCOSUSDT",
+    "DGBUSDT",
+    "SCUSDT",
+    "LSKUSDT",
+    "STMXUSDT",
+    "BTSUSDT",
+    "BTS_USDT",
+    "MBOXUSDT",
+    "DEGOUSDT",
+    "BARUSDT",
+    "PSGUSDT",
+    "CITYUSDT",
+    "JUVUSDT",
+    "ACMUSDT",
+    "ASRUSDT",
+    "ATMUSDT",
+    "OGUSDT",
+    "LAZIOUSDT",
+    "PORTOUSDT",
+    "SANTOSUSDT",
+    "ALPINEUSDT",
+    # --- أزواج فوركس ورموز مقترنة (مثل الذهب والعملات البديلة عبر البينانس) ---
+    "PAXGUSDT",  # الذهب الرقمي
+    "EURUSDT",
+    "GBPUSDT",
+    "AUDUSDT",
+    "NZDUSDT",
+    "USDCUSDT",
+    "TUSDUSDT",
+    "FDUSDUSDT",
 ]
 
 TIMEFRAME = "1h"
@@ -31,6 +257,8 @@ closed_trades = []
 # ==========================================
 # 2. دوال الاتصال وجلب البيانات والصور
 # ==========================================
+
+
 def send_telegram_alert(message):
   url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
   payload = {
@@ -43,6 +271,7 @@ def send_telegram_alert(message):
     print(f"Telegram response: {response.text}")
   except Exception as e:
     print(f"خطأ في إرسال التلجرام: {e}")
+
 
 def send_telegram_photo(photo_bytes, caption):
   url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendPhoto"
@@ -57,6 +286,7 @@ def send_telegram_photo(photo_bytes, caption):
   except Exception as e:
     print(f"خطأ في إرسال الصورة للتلجرام: {e}")
 
+
 def get_binance_klines(symbol, interval, limit=100):
   url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
   try:
@@ -64,16 +294,30 @@ def get_binance_klines(symbol, interval, limit=100):
     data = response.json()
     if not isinstance(data, list):
       return None
-    df = pd.DataFrame(data, columns=[
-        "timestamp", "open", "high", "low", "close", "volume",
-        "close_time", "quote_av", "trades", "tb_base_av", "tb_quote_av", "ignore"
-    ])
+    df = pd.DataFrame(
+        data,
+        columns=[
+            "timestamp",
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+            "close_time",
+            "quote_av",
+            "trades",
+            "tb_base_av",
+            "tb_quote_av",
+            "ignore",
+        ],
+    )
     df["close"] = df["close"].astype(float)
     df["high"] = df["high"].astype(float)
     df["low"] = df["low"].astype(float)
     return df
   except Exception:
     return None
+
 
 def get_current_price(symbol):
   url = f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}"
@@ -82,6 +326,7 @@ def get_current_price(symbol):
     return float(response.json()["price"])
   except:
     return None
+
 
 # ==========================================
 # 3. توليد صورة إحصائيات آخر الصفقات
@@ -97,8 +342,20 @@ def generate_stats_image():
   fig, ax = plt.subplots(figsize=(8, 6), facecolor="#1e1e1e")
   ax.set_facecolor("#1e1e1e")
   ax.axis("off")
-  title_text = f"تقرير أداء الصفقات (آخر {len(recent)} صفقات)\nنسبة النجاح: {win_rate:.1f}% (ربح: {wins} | خسارة: {losses})"
-  ax.text(0.5, 0.92, title_text, color="white", fontsize=14, fontweight="bold", ha="center", transform=ax.transAxes)
+  title_text = (
+      f"تقرير أداء الصفقات (آخر {len(recent)} صفقات)\nنسبة النجاح:"
+      f" {win_rate:.1f}% (ربح: {wins} | خسارة: {losses})"
+  )
+  ax.text(
+      0.5,
+      0.92,
+      title_text,
+      color="white",
+      fontsize=14,
+      fontweight="bold",
+      ha="center",
+      transform=ax.transAxes,
+  )
 
   table_data = []
   for t in recent:
@@ -106,7 +363,9 @@ def generate_stats_image():
     table_data.append([t["symbol"], t["type"], f"{t['entry']:.2f}", res_text])
 
   columns = ["الزوج", "النوع", "سعر الدخول", "النتيجة"]
-  table = ax.table(cellText=table_data, colLabels=columns, loc="center", cellLoc="center")
+  table = ax.table(
+      cellText=table_data, colLabels=columns, loc="center", cellLoc="center"
+  )
   table.auto_set_font_size(False)
   table.set_fontsize(10)
   table.scale(1, 1.3)
@@ -121,10 +380,13 @@ def generate_stats_image():
 
   plt.tight_layout()
   buf = io.BytesIO()
-  plt.savefig(buf, format="png", dpi=150, facecolor=fig.get_facecolor(), edgecolor="none")
+  plt.savefig(
+      buf, format="png", dpi=150, facecolor=fig.get_facecolor(), edgecolor="none"
+  )
   buf.seek(0)
   plt.close(fig)
   return buf.getvalue()
+
 
 # ==========================================
 # 4. خوارزمية صانع السوق وتتبع الصفقات
@@ -178,6 +440,7 @@ def analyze_market_maker_model(symbol):
     )
     send_telegram_alert(msg)
 
+
 def track_open_trades():
   if not active_trades:
     return
@@ -222,26 +485,31 @@ def track_open_trades():
       if photo:
         send_telegram_photo(photo, "إحصائيات أداء الصفقات الحالية")
 
+
 # ==========================================
 # 5. تشغيل البوت في الخلفية والسيرفر الرئيسي
 # ==========================================
 def run_bot():
   print("تم بدء تشغيل حلقة البوت...")
   time.sleep(3)
-  send_telegram_alert("🤖 تم تشغيل بوت صانع السوق بنجاح وهو الآن يراقب الأسواق!")
+  send_telegram_alert(
+      "🤖 تم تشغيل بوت صانع السوق بنجاح وهو الآن يراقب الأسواق!"
+  )
 
   while True:
     print("جاري فحص الأسواق...")
     try:
-      with ThreadPoolExecutor(max_workers=5) as executor:
+      with ThreadPoolExecutor(max_workers=10) as executor:
         executor.map(analyze_market_maker_model, SYMBOLS)
       track_open_trades()
     except Exception as e:
       print(f"خطأ أثناء الفحص: {e}")
-    
+
     time.sleep(60)
 
+
 class SimpleHandler(BaseHTTPRequestHandler):
+
   def do_GET(self):
     self.send_response(200)
     self.end_headers()
@@ -250,6 +518,7 @@ class SimpleHandler(BaseHTTPRequestHandler):
   def do_HEAD(self):
     self.send_response(200)
     self.end_headers()
+
 
 if __name__ == "__main__":
   bot_thread = threading.Thread(target=run_bot)
