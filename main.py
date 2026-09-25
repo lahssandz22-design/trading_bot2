@@ -1,17 +1,41 @@
-import time
-import requests
-import pandas as pd
-import numpy as np
 import io
+import os
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import matplotlib
 matplotlib.use('Agg') # لتوليد الصور بدون واجهة رسومية على السيرفر
 import matplotlib.pyplot as plt
-from concurrent.futures import ThreadPoolExecutor
+import pandas as pd
+import requests
+
+# ==========================================
+# 0. سيرفر وهمي لإرضاء منصة Render وتشغيل البوت مجاناً
+# ==========================================
+class SimpleHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Market Maker Bot is running successfully!")
+
+    def do_HEAD(self):
+        self.send_response(200)
+        self.end_headers()
+
+def run_server():
+    port = int(os.environ.get("PORT", 10000))
+    server = HTTPServer(("0.0.0.0", port), SimpleHandler)
+    server.serve_forever()
+
+server_thread = threading.Thread(target=run_server)
+server_thread.daemon = True
+server_thread.start()
 
 # ==========================================
 # 1. إعدادات البوت والمنصة
 # ==========================================
-TELEGRAM_BOT_TOKEN = "869642227:AAGNB88pBF_kJzEVBLzFQrBGv7yRG5f3Js4" # استبدله بتوكن بوتك الجديد
+TELEGRAM_BOT_TOKEN = "869642227:AAGNB88pBF_kJzEVBLzFQrBGv7yRG5f3Js4"
 TELEGRAM_CHAT_ID = "7895743860"
 
 # قائمة موسعة تضم أكثر من 70 زوجاً وعملة رقمية وفوركس متاحة للمراقبة
