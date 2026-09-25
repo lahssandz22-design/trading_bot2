@@ -29,7 +29,6 @@ def run_server():
   server = HTTPServer(("0.0.0.0", port), SimpleHandler)
   server.serve_forever()
 
-# تشغيل السيرفر في خلفية مستقلة
 server_thread = threading.Thread(target=run_server)
 server_thread.daemon = True
 server_thread.start()
@@ -229,7 +228,6 @@ def track_open_trades():
       closed_trades.append(trade)
       active_trades.remove(trade)
 
-      res_icon = "رابحة" : "خاسري" if result == "WIN" else "خاسرة" # تم التصحيح
       res_text_final = "رابحة" if result == "WIN" else "خاسرة"
       msg = (
           f"تحديث نتيجة صفقة مغلقة\n\n"
@@ -246,7 +244,7 @@ def track_open_trades():
         send_telegram_photo(photo, "إحصائيات أداء الصفقات الحالية")
 
 # ==========================================
-# 5. تشغيل البوت في خيط مستقل (Thread)
+# 5. تشغيل البوت
 # ==========================================
 def run_bot():
   print("تم بدء تشغيل حلقة البوت...")
@@ -264,11 +262,9 @@ def run_bot():
     time.sleep(60)
 
 if __name__ == "__main__":
-  # تشغيل البوت في خيط خلفي لكي لا يتعارض مع سيرفر الويب الخاص بـ Render
   bot_thread = threading.Thread(target=run_bot)
   bot_thread.daemon = True
   bot_thread.start()
 
-  # إبقاء السيرفر الرئيسي حياً
   while True:
     time.sleep(3600)
