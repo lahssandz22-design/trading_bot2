@@ -6,7 +6,7 @@ import threading
 import time
 import matplotlib
 
-matplotlib.use("Agg")  # لتوليد الصور بدون واجهة رسومية على السيرفر
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 import requests
@@ -42,12 +42,9 @@ server_thread.start()
 # 1. إعدادات البوت والمنصة والأمان
 # ==========================================
 TELEGRAM_BOT_TOKEN = "869642227:AAGNB88pBF_kJzEVBLzFQrBGv7yRG5f3Js4"
-# معرف المستخدم الخاص بك حصرياً لضمان عدم السماح لأي شخص آخر بالتحكم أو الاستخدام
 AUTHORIZED_CHAT_ID = "7895743860"
 
-# قائمة موسعة تضم أكثر من 70 زوجاً وعملة رقمية وفوركس متاحة للمراقبة
 SYMBOLS = [
-    # العملات الرقمية الكبرى والشهيرة
     "BTCUSDT",
     "ETHUSDT",
     "SOLUSDT",
@@ -97,7 +94,6 @@ SYMBOLS = [
     "COMPUSDT",
     "LDOUSDT",
     "RUNEUSDT",
-    # عملات إضافية لتغطية العدد وزيادة الفرص
     "KASUSDT",
     "STXUSDT",
     "ICPUSDT",
@@ -122,9 +118,8 @@ SYMBOLS = [
 TIMEFRAME = "1h"
 last_signals = {symbol: None for symbol in SYMBOLS}
 
-# قائمة لتخزين الصفقات النشطة والمنتهية
 active_trades = []
-closed_trades = []  # سيحفظ آخر الصفقات لتوليد السجل والصورة
+closed_trades = []
 
 
 # ==========================================
@@ -140,7 +135,7 @@ def send_telegram_alert(message):
   try:
     requests.post(url, data=payload, timeout=5)
   except Exception as e:
-    print(f"❌ خطأ في إرسال التلجرام: {e}")
+    print(f"خطأ في إرسال التلجرام: {e}")
 
 
 def send_telegram_photo(photo_bytes, caption):
@@ -154,7 +149,7 @@ def send_telegram_photo(photo_bytes, caption):
   try:
     requests.post(url, data=data, files=files, timeout=10)
   except Exception as e:
-    print(f"❌ خطأ في إرسال الصورة للتلجرام: {e}")
+    print(f"خطأ في إرسال الصورة للتلجرام: {e}")
 
 
 def get_binance_klines(symbol, interval, limit=100):
@@ -206,7 +201,7 @@ def generate_stats_image():
   if not closed_trades:
     return None
 
-  recent = closed_trades[-20:]  # آخر 20 صفقة
+  recent = closed_trades[-20:]
   wins = sum(1 for t in recent if t["result"] == "WIN")
   losses = len(recent) - wins
   win_rate = (wins / len(recent)) * 100 if len(recent) > 0 else 0
@@ -216,7 +211,7 @@ def generate_stats_image():
 
   ax.axis("off")
   title_text = (
-      f"📊 تقرير أداء الصفقات (آخر {len(recent)} صفقات)\nنسبة النجاح:"
+      f"تقرير أداء الصفقات (آخر {len(recent)} صفقات)\nنسبة النجاح:"
       f" {win_rate:.1f}% (ربح: {wins} | خسارة: {losses})"
   )
   ax.text(
@@ -232,8 +227,8 @@ def generate_stats_image():
 
   table_data = []
   for t in recent:
-    res_text = "✅ رابحة" if t["result"] == "WIN" else "❌ خاسرة"
-    table_data.append([t["symbol"], t["type"], f\"{t['entry']:.2f}\", res_text])
+    res_text = "رابحة" if t["result"] == "WIN" else "خاسرة"
+    table_data.append([t["symbol"], t["type"], f"{t['entry']:.2f}", res_text])
 
   columns = ["الزوج", "النوع", "سعر الدخول", "النتيجة"]
   table = ax.table(
@@ -306,12 +301,12 @@ def analyze_market_maker_model(symbol):
     })
 
     msg = (
-        f"🏦 *إشارة جديدة وفق نموذج صانع السوق* 🏦\n\n"
-        f"• *الأصل:* `{symbol}`\n"
-        f"• *النوع:* `{'شراء 🟢' if signal_type == 'MM_BUY' else 'بيع 🔴'}`\n"
-        f"• *سعر الدخول:* `${entry_price:,.4f}`\n"
-        f"• *الهدف (TP):* `${tp:,.4f}`\n"
-        f"• *وقف الخسارة (SL):* `${sl:,.4f}`"
+        f"إشارة جديدة وفق نموذج صانع السوق\n\n"
+        f"• الأصل: {symbol}\n"
+        f"• النوع: {'شراء' if signal_type == 'MM_BUY' else 'بيع'}\n"
+        f"• سعر الدخول: {entry_price:,.4f}\n"
+        f"• الهدف: {tp:,.4f}\n"
+        f"• وقف الخسارة: {sl:,.4f}"
     )
     send_telegram_alert(msg)
 
@@ -345,44 +340,35 @@ def track_open_trades():
       closed_trades.append(trade)
       active_trades.remove(trade)
 
-      res_icon = (
-          "✅ رابحة (Target Hit)" if result == "WIN" else "❌ خاسرة (Stop Hit)"
-      )
+      res_icon = "رابحة" if result == "WIN" else "خاسرة"
       msg = (
-          f"📢 *تحديث نتيجة صفقة مغلقة*\n\n"
-          f"• *الأصل:* `{trade['symbol']}`\n"
-          f"• *النوع:* `{trade['type']}`\n"
-          f"• *سعر الدخول:* `${trade['entry']:,.4f}`\n"
-          f"• *سعر الخروج:* `${current_price:,.4f}`\n"
-          f"• *النتيجة:* *{res_icon}*"
+          f"تحديث نتيجة صفقة مغلقة\n\n"
+          f"• الأصل: {trade['symbol']}\n"
+          f"• النوع: {trade['type']}\n"
+          f"• سعر الدخول: {trade['entry']:,.4f}\n"
+          f"• سعر الخروج: {current_price:,.4f}\n"
+          f"• النتيجة: {res_icon}"
       )
       send_telegram_alert(msg)
 
       photo = generate_stats_image()
       if photo:
-        send_telegram_photo(photo, f"📊 *إحصائيات أداء الصفقات الحالية*")
+        send_telegram_photo(photo, "إحصائيات أداء الصفقات الحالية")
 
 
 # ==========================================
 # 5. حلقة التشغيل المستمر
 # ==========================================
 def run_bot():
-  print(f"✅ تم تشغيل البوت مع أكثر من 70 زوجاً والتتبع الآلي بنجاح...")
-  # رسالة تأكيد فورية تصلك عند بدء تشغيل البوت على السيرفر
-  send_telegram_alert(
-      f"🚀 *تم تشغيل بوت صانع السوق بنجاح وحماية خاصة*\n• جاري مراقبة"
-      f" `{len(SYMBOLS)}` زوجاً.\n• الحساب محمي ولا يمكن لأحد غيرك استلام التنبيهات."
-  )
+  print("تم تشغيل البوت بنجاح...")
+  send_telegram_alert("تم تشغيل بوت صانع السوق بنجاح وحماية خاصة")
 
   while True:
-    print(f"🔄 جاري فحص الأسواق وتتبع الصفقات المفتوحة...")
-
+    print("جاري فحص الأسواق...")
     with ThreadPoolExecutor(max_workers=10) as executor:
       executor.map(analyze_market_maker_model, SYMBOLS)
 
     track_open_trades()
-
-    print("⏳ انتهاء دورة الفحص، الاستراحة لمدة 60 ثانية...")
     time.sleep(60)
 
 
