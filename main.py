@@ -14,7 +14,7 @@ import requests
 # ==========================================
 # 1. إعدادات البوت والمنصة والأمان
 # ==========================================
-TELEGRAM_BOT_TOKEN = "887254346:AAFFbiuKXkZsity3lhfE7e7N2jg2aMfSDRI"
+TELEGRAM_BOT_TOKEN = "8872543456:AAFfbiuKXkZsity3lhfE7e7N2jg2aMfsDRI"
 AUTHORIZED_CHAT_ID = "7895743860"
 
 SYMBOLS = [
@@ -227,7 +227,7 @@ def track_open_trades():
 # ==========================================
 def run_bot():
   print("تم بدء تشغيل حلقة البوت...")
-  time.sleep(3) # الانتظار قليلاً لضمان استقرار السيرفر
+  time.sleep(3)
   send_telegram_alert("🤖 تم تشغيل بوت صانع السوق بنجاح وهو الآن يراقب الأسواق!")
 
   while True:
@@ -252,12 +252,10 @@ class SimpleHandler(BaseHTTPRequestHandler):
     self.end_headers()
 
 if __name__ == "__main__":
-  # تشغيل البوت في خيط منفصل فوراً
   bot_thread = threading.Thread(target=run_bot)
   bot_thread.daemon = True
   bot_thread.start()
 
-  # تشغيل السيرفر في الخيط الرئيسي لإرضاء منصة Render
   port = int(os.environ.get("PORT", 10000))
   server = HTTPServer(("0.0.0.0", port), SimpleHandler)
   print(f"السيرفر يعمل على المنفذ {port}")
