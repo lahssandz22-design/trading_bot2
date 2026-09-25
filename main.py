@@ -34,9 +34,9 @@ server_thread.daemon = True
 server_thread.start()
 
 # ==========================================
-# 1. إعدادات البوت والمنصة والأمان
+# 1. إعدادات البوت والمنصة والأمان (الرموز الصحيحة)
 # ==========================================
-TELEGRAM_BOT_TOKEN = "887254346:AAFFbiuKXkZsity3lhfE7e7N2jg2aMfSDRI"
+TELEGRAM_BOT_TOKEN = "869642227:AAGNB88pBF_kJzEVBLzFQrBGv7yRG5f3Js4"
 AUTHORIZED_CHAT_ID = "7895743860"
 
 SYMBOLS = [
