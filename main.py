@@ -12,29 +12,7 @@ import pandas as pd
 import requests
 
 # ==========================================
-# 0. سيرفر وهمي لإرضاء منصة Render
-# ==========================================
-class SimpleHandler(BaseHTTPRequestHandler):
-  def do_GET(self):
-    self.send_response(200)
-    self.end_headers()
-    self.wfile.write(b"Market Maker Bot is running successfully!")
-
-  def do_HEAD(self):
-    self.send_response(200)
-    self.end_headers()
-
-def run_server():
-  port = int(os.environ.get("PORT", 10000))
-  server = HTTPServer(("0.0.0.0", port), SimpleHandler)
-  server.serve_forever()
-
-server_thread = threading.Thread(target=run_server)
-server_thread.daemon = True
-server_thread.start()
-
-# ==========================================
-# 1. إعدادات البوت والمنصة والأمان (التوكن الصحيح الخاص بك)
+# 1. إعدادات البوت والمنصة والأمان
 # ==========================================
 TELEGRAM_BOT_TOKEN = "887254346:AAFFbiuKXkZsity3lhfE7e7N2jg2aMfSDRI"
 AUTHORIZED_CHAT_ID = "7895743860"
@@ -61,7 +39,8 @@ def send_telegram_alert(message):
       "parse_mode": "Markdown",
   }
   try:
-    requests.post(url, data=payload, timeout=5)
+    response = requests.post(url, data=payload, timeout=5)
+    print(f"Telegram response: {response.text}")
   except Exception as e:
     print(f"خطأ في إرسال التلجرام: {e}")
 
@@ -244,10 +223,11 @@ def track_open_trades():
         send_telegram_photo(photo, "إحصائيات أداء الصفقات الحالية")
 
 # ==========================================
-# 5. تشغيل البوت
+# 5. تشغيل البوت في الخلفية والسيرفر الرئيسي
 # ==========================================
 def run_bot():
   print("تم بدء تشغيل حلقة البوت...")
+  time.sleep(3) # الانتظار قليلاً لضمان استقرار السيرفر
   send_telegram_alert("🤖 تم تشغيل بوت صانع السوق بنجاح وهو الآن يراقب الأسواق!")
 
   while True:
@@ -261,10 +241,24 @@ def run_bot():
     
     time.sleep(60)
 
+class SimpleHandler(BaseHTTPRequestHandler):
+  def do_GET(self):
+    self.send_response(200)
+    self.end_headers()
+    self.wfile.write(b"Market Maker Bot is running successfully!")
+
+  def do_HEAD(self):
+    self.send_response(200)
+    self.end_headers()
+
 if __name__ == "__main__":
+  # تشغيل البوت في خيط منفصل فوراً
   bot_thread = threading.Thread(target=run_bot)
   bot_thread.daemon = True
   bot_thread.start()
 
-  while True:
-    time.sleep(3600)
+  # تشغيل السيرفر في الخيط الرئيسي لإرضاء منصة Render
+  port = int(os.environ.get("PORT", 10000))
+  server = HTTPServer(("0.0.0.0", port), SimpleHandler)
+  print(f"السيرفر يعمل على المنفذ {port}")
+  server.serve_forever()
