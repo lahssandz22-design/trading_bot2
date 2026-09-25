@@ -5,527 +5,235 @@ import os
 import threading
 import time
 import matplotlib
-
-matplotlib.use("Agg")
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
 import requests
+import ta
 
 # ==========================================
-# 1. إعدادات البوت والمنصة والأمان
+# 1. إعدادات التلجرام وبينانس
 # ==========================================
-TELEGRAM_BOT_TOKEN = "8872543456:AAFfbiuKXkZsity3lhfE7e7N2jg2aMfsDRI"
-AUTHORIZED_CHAT_ID = "7895743860"
+TELEGRAM_BOT_TOKEN = "8617483405:AAGhNHH1A3X1twjDUU5fwdWr6rUYKMhc9gc"
+TELEGRAM_CHAT_ID = "7895743860"
 
-# قائمة موسعة تضم 200 زوج (عملات رقمية وأزواج فوركس وقوة تدفق مختلفة)
-SYMBOLS = [
-    # --- العملات الرقمية الكبرى (Major Crypto) ---
-    "BTCUSDT",
-    "ETHUSDT",
-    "SOLUSDT",
-    "BNBUSDT",
-    "XRPUSDT",
-    "ADAUSDT",
-    "AVAXUSDT",
-    "DOGEUSDT",
-    "DOTUSDT",
-    "LINKUSDT",
-    "NEARUSDT",
-    "MATICUSDT",
-    "LTCUSDT",
-    "UNIUSDT",
-    "FILUSDT",
-    "ATOMUSDT",
-    "ETCUSDT",
-    "XLMUSDT",
-    "BCHUSDT",
-    "APTUSDT",
-    "SUIUSDT",
-    "ARBUSDT",
-    "OPUSDT",
-    "INJUSDT",
-    "RNDRUSDT",
-    "TIAUSDT",
-    "SEIUSDT",
-    "FETUSDT",
-    "AGIXUSDT",
-    "RENDERUSDT",
-    # --- العملات الرقمية متوسطة وقوية العزم (Altcoins & Mid-cap) ---
-    "PEPEUSDT",
-    "SHIBUSDT",
-    "FLOKIUSDT",
-    "BONKUSDT",
-    "WIFUSDT",
-    "ARUSDT",
-    "IMXUSDT",
-    "SANDUSDT",
-    "MANAUSDT",
-    "AXSUSDT",
-    "GALAUSDT",
-    "CHZUSDT",
-    "CRVUSDT",
-    "AAVEUSDT",
-    "MKRUSDT",
-    "SNXUSDT",
-    "COMPUSDT",
-    "LDOUSDT",
-    "RUNEUSDT",
-    "KASUSDT",
-    "STXUSDT",
-    "ICPUSDT",
-    "ALGOUSDT",
-    "FTMUSDT",
-    "HBARUSDT",
-    "VETUSDT",
-    "THETAUSDT",
-    "EGLDUSDT",
-    "EOSUSDT",
-    "XTZUSDT",
-    "KAVAUSDT",
-    "ZILUSDT",
-    "BATUSDT",
-    "ENJUSDT",
-    "ZRXUSDT",
-    "IOSTUSDT",
-    "ONTUSDT",
-    "QTUMUSDT",
-    "JUPUSDT",
-    "PYTHUSDT",
-    "PENDLEUSDT",
-    "OMUSDT",
-    "ONDOUSDT",
-    "CYBERUSDT",
-    "MEMEUSDT",
-    "BOMEUSDT",
-    "POLUSDT",
-    "STRKUSDT",
-    "PORTALUSDT",
-    "ALTUSDT",
-    "PIXELUSDT",
-    "ACEUSDT",
-    "NFPUSDT",
-    "AIUSDT",
-    "XAIUSDT",
-    "MANTAUSDT",
-    "ZETAUSDT",
-    "DYMUSDT",
-    "JTOUSDT",
-    "BLURUSDT",
-    "ORDIUSDT",
-    "SATSUSDT",
-    "RATSUSDT",
-    "BEAMXUSDT",
-    "MAVUSDT",
-    "PENDLEUSDT",
-    "SSVUSDT",
-    "CFXUSDT",
-    "ACHUSDT",
-    "HIFIUSDT",
-    "ARKMUSDT",
-    "IDUSDT",
-    "EDUUSDT",
-    "COMBOUSDT",
-    "JOEUSDT",
-    "GMXUSDT",
-    "LUNA2USDT",
-    "USTCUSDT",
-    "POLYXUSDT",
-    "BCHUSDT",
-    "TRXUSDT",
-    "XEMUSDT",
-    "IOUSDT",
-    "ZKUSDT",
-    "REZUSDT",
-    "BBUSDT",
-    "NOTUSDT",
-    "TNSRUSDT",
-    "SAGAUSDT",
-    "ENAUSDT",
-    "WUSDT",
-    "ETHFIUSDT",
-    "BOMEUSDT",
-    "AEVOUSDT",
-    "PORTALUSDT",
-    "PIXELUSDT",
-    "ALTUSDT",
-    "MANTAUSDT",
-    "JUPUSDT",
-    "PYTHUSDT",
-    "DIMOUSDT",
-    "PONKEUSDT",
-    "MEWUSDT",
-    "SLERFUSDT",
-    "BENDOGUSDT",
-    "PRIMEUSDT",
-    "SUPERUSDT",
-    "TOKENUSDT",
-    "PROMUSDT",
-    "QIUSDT",
-    "OXTUSDT",
-    "C98USDT",
-    "CLVUSDT",
-    "COTIUSDT",
-    "DODOUSDT",
-    "FIDAUSDT",
-    "FRONTUSDT",
-    "GTCUSDT",
-    "HFTUSDT",
-    "HIGHUSDT",
-    "ILVUSDT",
-    "LITUSDT",
-    "LOKAUSDT",
-    "MCUSDT",
-    "MDBUSDT",
-    "MTLUSDT",
-    "NKNUSDT",
-    "OGNUSDT",
-    "PONDUSDT",
-    "QKCUSDT",
-    "RADUSDT",
-    "RAMPUSDT",
-    "REEFUSDT",
-    "RFUSDT",
-    "RLCUSDT",
-    "ROSEUSDT",
-    "SPAUSDT",
-    "SPELLUSDT",
-    "SRMUSDT",
-    "STGUSDT",
-    "SUNUSDT",
-    "SUPERUSDT",
-    "SYSUSDT",
-    "T_USDT",
-    "TLMUSDT",
-    "TRUUSDT",
-    "TURBOUSDT",
-    "UFTUSDT",
-    "UNFIUSDT",
-    "VIDTUSDT",
-    "VOXELUSDT",
-    "WANUSDT",
-    "WAXPUSDT",
-    "WNXMUSDT",
-    "WOOUSDT",
-    "XVSUSDT",
-    "YFIUSDT",
-    "YGGUSDT",
-    "ZENUSDT",
-    "GNSUSDT",
-    "POLSUSDT",
-    "PERPUSDT",
-    "MOVRUSDT",
-    "GLMRUSDT",
-    "BICOUSDT",
-    "FLUXUSDT",
-    "COCOSUSDT",
-    "DGBUSDT",
-    "SCUSDT",
-    "LSKUSDT",
-    "STMXUSDT",
-    "BTSUSDT",
-    "BTS_USDT",
-    "MBOXUSDT",
-    "DEGOUSDT",
-    "BARUSDT",
-    "PSGUSDT",
-    "CITYUSDT",
-    "JUVUSDT",
-    "ACMUSDT",
-    "ASRUSDT",
-    "ATMUSDT",
-    "OGUSDT",
-    "LAZIOUSDT",
-    "PORTOUSDT",
-    "SANTOSUSDT",
-    "ALPINEUSDT",
-    # --- أزواج فوركس ورموز مقترنة (مثل الذهب والعملات البديلة عبر البينانس) ---
-    "PAXGUSDT",  # الذهب الرقمي
-    "EURUSDT",
-    "GBPUSDT",
-    "AUDUSDT",
-    "NZDUSDT",
-    "USDCUSDT",
-    "TUSDUSDT",
-    "FDUSDUSDT",
-]
+def fetch_top_usdt_symbols():
+    """جلب أهم وأبرز أزواج USDT النشطة من بينانس لتفادي الضغط أو الحظر"""
+    url = "https://api.binance.com/api/v3/exchangeInfo"
+    try:
+        response = requests.get(url, timeout=10)
+        data = response.json()
+        symbols = []
+        for s in data.get('symbols', []):
+            if s['status'] == 'TRADING' and s['quoteAsset'] == 'USDT':
+                symbol_name = s['symbol']
+                if not any(stable in symbol_name for stable in ['USDC', 'FDUSD', 'TUSD', 'USDP', 'BUSD']):
+                    symbols.append(symbol_name)
+        symbols = symbols[:50]
+        print(f"✅ تم بنجاح جلب {len(symbols)} زوجاً للتداول من بينانس.")
+        return symbols
+    except Exception as e:
+        print(f"❌ خطأ في جلب الأزواج تلقائياً، استخدام القائمة الافتراضية: {e}")
+        return ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT", "ADAUSDT", "DOGEUSDT", "AVAXUSDT"]
 
+SYMBOLS = fetch_top_usdt_symbols()
 TIMEFRAME = "1h"
+MAX_OPEN_TRADES = 20
+
+active_trades = {}
 last_signals = {symbol: None for symbol in SYMBOLS}
-active_trades = []
-closed_trades = []
-
-# ==========================================
-# 2. دوال الاتصال وجلب البيانات والصور
-# ==========================================
-
+closed_trades_history = []
 
 def send_telegram_alert(message):
-  url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-  payload = {
-      "chat_id": AUTHORIZED_CHAT_ID,
-      "text": message,
-      "parse_mode": "Markdown",
-  }
-  try:
-    response = requests.post(url, data=payload, timeout=5)
-    print(f"Telegram response: {response.text}")
-  except Exception as e:
-    print(f"خطأ في إرسال التلجرام: {e}")
-
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": message,
+        "parse_mode": "Markdown"
+    }
+    try:
+        response = requests.post(url, data=payload, timeout=10)
+        print(f"Telegram response: {response.text}")
+    except Exception as e:
+        print(f"❌ خطأ في إرسال التلجرام: {e}")
 
 def send_telegram_photo(photo_bytes, caption):
-  url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendPhoto"
-  files = {"photo": ("stats.png", photo_bytes, "image/png")}
-  data = {
-      "chat_id": AUTHORIZED_CHAT_ID,
-      "caption": caption,
-      "parse_mode": "Markdown",
-  }
-  try:
-    requests.post(url, data=data, files=files, timeout=10)
-  except Exception as e:
-    print(f"خطأ في إرسال الصورة للتلجرام: {e}")
-
-
-def get_binance_klines(symbol, interval, limit=100):
-  url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
-  try:
-    response = requests.get(url, timeout=5)
-    data = response.json()
-    if not isinstance(data, list):
-      return None
-    df = pd.DataFrame(
-        data,
-        columns=[
-            "timestamp",
-            "open",
-            "high",
-            "low",
-            "close",
-            "volume",
-            "close_time",
-            "quote_av",
-            "trades",
-            "tb_base_av",
-            "tb_quote_av",
-            "ignore",
-        ],
-    )
-    df["close"] = df["close"].astype(float)
-    df["high"] = df["high"].astype(float)
-    df["low"] = df["low"].astype(float)
-    return df
-  except Exception:
-    return None
-
-
-def get_current_price(symbol):
-  url = f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}"
-  try:
-    response = requests.get(url, timeout=3)
-    return float(response.json()["price"])
-  except:
-    return None
-
-
-# ==========================================
-# 3. توليد صورة إحصائيات آخر الصفقات
-# ==========================================
-def generate_stats_image():
-  if not closed_trades:
-    return None
-  recent = closed_trades[-20:]
-  wins = sum(1 for t in recent if t["result"] == "WIN")
-  losses = len(recent) - wins
-  win_rate = (wins / len(recent)) * 100 if len(recent) > 0 else 0
-
-  fig, ax = plt.subplots(figsize=(8, 6), facecolor="#1e1e1e")
-  ax.set_facecolor("#1e1e1e")
-  ax.axis("off")
-  title_text = (
-      f"تقرير أداء الصفقات (آخر {len(recent)} صفقات)\nنسبة النجاح:"
-      f" {win_rate:.1f}% (ربح: {wins} | خسارة: {losses})"
-  )
-  ax.text(
-      0.5,
-      0.92,
-      title_text,
-      color="white",
-      fontsize=14,
-      fontweight="bold",
-      ha="center",
-      transform=ax.transAxes,
-  )
-
-  table_data = []
-  for t in recent:
-    res_text = "رابحة" if t["result"] == "WIN" else "خاسرة"
-    table_data.append([t["symbol"], t["type"], f"{t['entry']:.2f}", res_text])
-
-  columns = ["الزوج", "النوع", "سعر الدخول", "النتيجة"]
-  table = ax.table(
-      cellText=table_data, colLabels=columns, loc="center", cellLoc="center"
-  )
-  table.auto_set_font_size(False)
-  table.set_fontsize(10)
-  table.scale(1, 1.3)
-
-  for key, cell in table.get_celld().items():
-    cell.set_text_props(color="white")
-    if key[0] == 0:
-      cell.set_facecolor("#333333")
-      cell.set_text_props(weight="bold")
-    else:
-      cell.set_facecolor("#2a2a2a")
-
-  plt.tight_layout()
-  buf = io.BytesIO()
-  plt.savefig(
-      buf, format="png", dpi=150, facecolor=fig.get_facecolor(), edgecolor="none"
-  )
-  buf.seek(0)
-  plt.close(fig)
-  return buf.getvalue()
-
-
-# ==========================================
-# 4. خوارزمية صانع السوق وتتبع الصفقات
-# ==========================================
-def analyze_market_maker_model(symbol):
-  df = get_binance_klines(symbol, TIMEFRAME, limit=60)
-  if df is None or len(df) < 45:
-    return
-
-  lookback = 40
-  recent_high = df["high"].iloc[-lookback:-1].max()
-  recent_low = df["low"].iloc[-lookback:-1].min()
-  equilibrium = (recent_high + recent_low) / 2
-
-  current_close = df["close"].iloc[-2]
-  current_low = df["low"].iloc[-2]
-  current_high = df["high"].iloc[-2]
-  signal_type = None
-
-  if current_close < equilibrium and current_low < recent_low:
-    signal_type = "MM_BUY"
-  elif current_close > equilibrium and current_high > recent_high:
-    signal_type = "MM_SELL"
-
-  if signal_type and last_signals.get(symbol) != signal_type:
-    last_signals[symbol] = signal_type
-    entry_price = current_close
-
-    if signal_type == "MM_BUY":
-      tp = entry_price * 1.015
-      sl = entry_price * 0.9925
-    else:
-      tp = entry_price * 0.985
-      sl = entry_price * 1.0075
-
-    active_trades.append({
-        "symbol": symbol,
-        "type": "شراء (BUY)" if signal_type == "MM_BUY" else "بيع (SELL)",
-        "entry": entry_price,
-        "tp": tp,
-        "sl": sl,
-    })
-
-    msg = (
-        f"إشارة جديدة وفق نموذج صانع السوق\n\n"
-        f"• الأصل: {symbol}\n"
-        f"• النوع: {'شراء' if signal_type == 'MM_BUY' else 'بيع'}\n"
-        f"• سعر الدخول: {entry_price:,.4f}\n"
-        f"• الهدف: {tp:,.4f}\n"
-        f"• وقف الخسارة: {sl:,.4f}"
-    )
-    send_telegram_alert(msg)
-
-
-def track_open_trades():
-  if not active_trades:
-    return
-
-  for trade in active_trades[:]:
-    current_price = get_current_price(trade["symbol"])
-    if not current_price:
-      continue
-
-    is_buy = "شراء" in trade["type"]
-    closed = False
-    result = None
-
-    if is_buy:
-      if current_price >= trade["tp"]:
-        closed, result = True, "WIN"
-      elif current_price <= trade["sl"]:
-        closed, result = True, "LOSS"
-    else:
-      if current_price <= trade["tp"]:
-        closed, result = True, "WIN"
-      elif current_price >= trade["sl"]:
-        closed, result = True, "LOSS"
-
-    if closed:
-      trade["result"] = result
-      closed_trades.append(trade)
-      active_trades.remove(trade)
-
-      res_text_final = "رابحة" if result == "WIN" else "خاسرة"
-      msg = (
-          f"تحديث نتيجة صفقة مغلقة\n\n"
-          f"• الأصل: {trade['symbol']}\n"
-          f"• النوع: {trade['type']}\n"
-          f"• سعر الدخول: {trade['entry']:,.4f}\n"
-          f"• سعر الخروج: {current_price:,.4f}\n"
-          f"• النتيجة: {res_text_final}"
-      )
-      send_telegram_alert(msg)
-
-      photo = generate_stats_image()
-      if photo:
-        send_telegram_photo(photo, "إحصائيات أداء الصفقات الحالية")
-
-
-# ==========================================
-# 5. تشغيل البوت في الخلفية والسيرفر الرئيسي
-# ==========================================
-def run_bot():
-  print("تم بدء تشغيل حلقة البوت...")
-  time.sleep(3)
-  send_telegram_alert(
-      "🤖 تم تشغيل بوت صانع السوق بنجاح وهو الآن يراقب الأسواق!"
-  )
-
-  while True:
-    print("جاري فحص الأسواق...")
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendPhoto"
+    files = {'photo': ('performance.png', photo_bytes, 'image/png')}
+    data = {'chat_id': TELEGRAM_CHAT_ID, 'caption': caption, 'parse_mode': 'Markdown'}
     try:
-      with ThreadPoolExecutor(max_workers=10) as executor:
-        executor.map(analyze_market_maker_model, SYMBOLS)
-      track_open_trades()
+        response = requests.post(url, data=data, files=files, timeout=15)
+        print(f"Telegram photo response: {response.text}")
     except Exception as e:
-      print(f"خطأ أثناء الفحص: {e}")
+        print(f"❌ خطأ في إرسال الصورة للتلجرام: {e}")
 
-    time.sleep(60)
+def get_binance_klines(symbol, interval, limit=250):
+    url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
+    try:
+        response = requests.get(url, timeout=5)
+        data = response.json()
+        if not isinstance(data, list):
+            return None
+        df = pd.DataFrame(data, columns=[
+            'timestamp', 'open', 'high', 'low', 'close', 'volume',
+            'close_time', 'quote_av', 'trades', 'tb_base_av', 'tb_quote_av', 'ignore'
+        ])
+        df['close'] = df['close'].astype(float)
+        df['high'] = df['high'].astype(float)
+        df['low'] = df['low'].astype(float)
+        return df
+    except Exception:
+        return None
 
+def generate_performance_chart(trades_batch):
+    wins = sum(1 for t in trades_batch if t['result'] == 'WIN')
+    losses = sum(1 for t in trades_batch if t['result'] == 'LOSS')
+    win_rate = (wins / len(trades_batch)) * 100 if len(trades_batch) > 0 else 0
+
+    fig, ax = plt.subplots(figsize=(6, 4))
+    categories = ['الربح (WIN)', 'الخسارة (LOSS)']
+    counts = [wins, losses]
+    colors = ['#2ecc71', '#e74c3c']
+
+    ax.bar(categories, counts, color=colors)
+    ax.set_title(f"نتائج آخر {len(trades_batch)} صفقة (نسبة النجاح: {win_rate:.1f}%)", fontsize=12, fontweight='bold')
+    ax.set_ylabel('عدد الصفقات')
+
+    for i, v in enumerate(counts):
+        ax.text(i, v + 0.1, str(v), ha='center', fontweight='bold')
+
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    plt.close(fig)
+    return buf.getvalue()
+
+def check_and_close_trades():
+    global active_trades, closed_trades_history
+    for symbol in list(active_trades.keys()):
+        df = get_binance_klines(symbol, TIMEFRAME, limit=10)
+        if df is None:
+            continue
+        curr_price = df['close'].iloc[-1]
+        trade = active_trades[symbol]
+        
+        if trade['type'] == 'BUY':
+            if curr_price >= trade['tp']:
+                trade['result'] = 'WIN'
+                closed_trades_history.append(trade)
+                send_telegram_alert(f"🎯 *تم تحقيق الهدف (WIN)* للعملة {symbol} بسعر {curr_price}")
+                del active_trades[symbol]
+            elif curr_price <= trade['sl']:
+                trade['result'] = 'LOSS'
+                closed_trades_history.append(trade)
+                send_telegram_alert(f"🛑 *ضرب وقف الخسارة (LOSS)* للعملة {symbol} بسعر {curr_price}")
+                del active_trades[symbol]
+        elif trade['type'] == 'SELL':
+            if curr_price <= trade['tp']:
+                trade['result'] = 'WIN'
+                closed_trades_history.append(trade)
+                send_telegram_alert(f"🎯 *تم تحقيق الهدف (WIN)* للعملة {symbol} بسعر {curr_price}")
+                del active_trades[symbol]
+            elif curr_price >= trade['sl']:
+                trade['result'] = 'LOSS'
+                closed_trades_history.append(trade)
+                send_telegram_alert(f"🛑 *ضرب وقف الخسارة (LOSS)* للعملة {symbol} بسعر {curr_price}")
+                del active_trades[symbol]
+
+        if len(closed_trades_history) >= 20:
+            batch = closed_trades_history[:20]
+            closed_trades_history = closed_trades_history[20:]
+            chart_bytes = generate_performance_chart(batch)
+            wins = sum(1 for t in batch if t['result'] == 'WIN')
+            losses = sum(1 for t in batch if t['result'] == 'LOSS')
+            wr = (wins / 20) * 100
+            caption = f"📊 *تقرير أداء آخر 20 صفقة*\n✅ صفقات ناجحة: {wins}\n❌ صفقات خاسرة: {losses}\n📈 نسبة الربح: {wr:.1f}%"
+            send_telegram_photo(chart_bytes, caption)
+
+def analyze_symbol(symbol):
+    global active_trades
+    try:
+        df = get_binance_klines(symbol, TIMEFRAME, limit=250)
+        if df is None or len(df) < 50:
+            return
+            
+        curr_price = df['close'].iloc[-2]
+
+        if symbol in active_trades:
+            return
+        if len(active_trades) >= MAX_OPEN_TRADES:
+            return
+
+        # حساب مؤشر الماكد (الخط الأزرق: MACD، الخط البرتقالي: Signal Line)
+        macd_object = ta.trend.MACD(close=df["close"], window_slow=26, window_fast=12, window_sign=9)
+        df["macd"] = macd_object.macd()
+        df["signal"] = macd_object.macd_signal()
+
+        prev_macd = df["macd"].iloc[-3]
+        prev_signal = df["signal"].iloc[-3]
+        curr_macd = df["macd"].iloc[-2]
+        curr_signal = df["signal"].iloc[-2]
+
+        signal_type = None
+
+        # شروط الدخول الجديدة بناءً على طلبك:
+        # 1. صفقة شراء (BUY): تقاطع الخط الأزرق (MACD) فوق البرتقالي (Signal) تحت خط الصفر
+        if prev_macd <= prev_signal and curr_macd > curr_signal and curr_macd < 0:
+            signal_type = "BUY"
+
+        # 2. صفقة بيع (SELL): تقاطع الخط الأزرق (MACD) تحت البرتقالي (Signal) فوق خط الصفر
+        elif prev_macd >= prev_signal and curr_macd < curr_signal and curr_macd > 0:
+            signal_type = "SELL"
+
+        if signal_type and last_signals.get(symbol) != signal_type:
+            last_signals[symbol] = signal_type
+            
+            distance = curr_price * 0.015
+            if signal_type == "BUY":
+                sl = curr_price - distance
+                tp = curr_price + (distance * 2)
+            else:
+                sl = curr_price + distance
+                tp = curr_price - (distance * 2)
+
+            msg = f"🚨 *إشارة {signal_type} للعملة {symbol}*\n💰 سعر الدخول: {curr_price}\n🎯 الهدف (TP): {tp:.4f}\n🛑 وقف الخسارة (SL): {sl:.4f}"
+            send_telegram_alert(msg)
+            active_trades[symbol] = {"type": signal_type, "tp": tp, "sl": sl}
+    except Exception as e:
+        print(f"خطأ في تحليل العملة {symbol}: {e}")
+
+def run_bot():
+    print(f"🚀 بدأ تشغيل البوت في الخلفية لمراقبة {len(SYMBOLS)} زوجاً...")
+    send_telegram_alert(f"🤖 *تم تحديث وتشغيل بوت التداول بنجاح!*\nاستراتيجية تقاطع الماكد (تحت الصفر للشراء / فوق الصفر للبيع).\nجاري مراقبة {len(SYMBOLS)} زوجاً نشطاً.")
+    
+    while True:
+        try:
+            print("⏳ جاري فحص الأسواق وتحديث الصفقات...")
+            check_and_close_trades()
+            with ThreadPoolExecutor(max_workers=10) as executor:
+                executor.map(analyze_symbol, SYMBOLS)
+            print("✅ انتهت دورة الفحص بنجاح. في انتظار الدورة القادمة...")
+        except Exception as e:
+            print(f"❌ خطأ عام في حلقة التداول الرئيسية: {e}")
+        
+        time.sleep(120)
 
 class SimpleHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Trading Bot is running successfully!")
 
-  def do_GET(self):
-    self.send_response(200)
-    self.end_headers()
-    self.wfile.write(b"Market Maker Bot is running successfully!")
-
-  def do_HEAD(self):
-    self.send_response(200)
-    self.end_headers()
-
+    def do_HEAD(self):
+        self.send_response(200)
+        self.end_headers()
 
 if __name__ == "__main__":
-  bot_thread = threading.Thread(target=run_bot)
-  bot_thread.daemon = True
-  bot_thread.start()
+    bot_thread = threading.Thread(target=run_bot)
+    bot_thread.daemon = True
+    bot_thread.start()
 
-  port = int(os.environ.get("PORT", 10000))
-  server = HTTPServer(("0.0.0.0", port), SimpleHandler)
-  print(f"السيرفر يعمل على المنفذ {port}")
-  server.serve_forever()
+    port = int(os.environ.get("PORT", 10000))
+    server = HTTPServer(("0.0.0.0", port), SimpleHandler)
+    server.serve_forever()
