@@ -12,12 +12,9 @@ import pandas as pd
 import requests
 
 # ==========================================
-# 0. سيرفر وهمي لإرضاء منصة Render وتشغيل البوت مجاناً
+# 0. سيرفر وهمي لإرضاء منصة Render
 # ==========================================
-
-
 class SimpleHandler(BaseHTTPRequestHandler):
-
   def do_GET(self):
     self.send_response(200)
     self.end_headers()
@@ -27,13 +24,12 @@ class SimpleHandler(BaseHTTPRequestHandler):
     self.send_response(200)
     self.end_headers()
 
-
 def run_server():
   port = int(os.environ.get("PORT", 10000))
   server = HTTPServer(("0.0.0.0", port), SimpleHandler)
   server.serve_forever()
 
-
+# تشغيل السيرفر في خلفية مستقلة
 server_thread = threading.Thread(target=run_server)
 server_thread.daemon = True
 server_thread.start()
@@ -45,82 +41,15 @@ TELEGRAM_BOT_TOKEN = "887254346:AAFFbiuKXkZsity3lhfE7e7N2jg2aMfSDRI"
 AUTHORIZED_CHAT_ID = "7895743860"
 
 SYMBOLS = [
-    "BTCUSDT",
-    "ETHUSDT",
-    "SOLUSDT",
-    "BNBUSDT",
-    "XRPUSDT",
-    "ADAUSDT",
-    "AVAXUSDT",
-    "DOGEUSDT",
-    "DOTUSDT",
-    "LINKUSDT",
-    "NEARUSDT",
-    "MATICUSDT",
-    "LTCUSDT",
-    "UNIUSDT",
-    "FILUSDT",
-    "ATOMUSDT",
-    "ETCUSDT",
-    "XLMUSDT",
-    "BCHUSDT",
-    "APTUSDT",
-    "SUIUSDT",
-    "ARBUSDT",
-    "OPUSDT",
-    "INJUSDT",
-    "RNDRUSDT",
-    "TIAUSDT",
-    "SEIUSDT",
-    "FETUSDT",
-    "AGIXUSDT",
-    "RENDERUSDT",
-    "PEPEUSDT",
-    "SHIBUSDT",
-    "FLOKIUSDT",
-    "BONKUSDT",
-    "WIFUSDT",
-    "ARUSDT",
-    "IMXUSDT",
-    "SANDUSDT",
-    "MANAUSDT",
-    "AXSUSDT",
-    "GALAUSDT",
-    "CHZUSDT",
-    "CRVUSDT",
-    "AAVEUSDT",
-    "MKRUSDT",
-    "SNXUSDT",
-    "COMPUSDT",
-    "LDOUSDT",
-    "RUNEUSDT",
-    "KASUSDT",
-    "STXUSDT",
-    "ICPUSDT",
-    "ALGOUSDT",
-    "FTMUSDT",
-    "HBARUSDT",
-    "VETUSDT",
-    "THETAUSDT",
-    "EGLDUSDT",
-    "EOSUSDT",
-    "XTZUSDT",
-    "KAVAUSDT",
-    "ZILUSDT",
-    "BATUSDT",
-    "ENJUSDT",
-    "ZRXUSDT",
-    "IOSTUSDT",
-    "ONTUSDT",
-    "QTUMUSDT",
+    "BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT",
+    "ADAUSDT", "AVAXUSDT", "DOGEUSDT", "DOTUSDT", "LINKUSDT",
+    "NEARUSDT", "MATICUSDT", "LTCUSDT", "UNIUSDT", "FILUSDT"
 ]
 
 TIMEFRAME = "1h"
 last_signals = {symbol: None for symbol in SYMBOLS}
-
 active_trades = []
 closed_trades = []
-
 
 # ==========================================
 # 2. دوال الاتصال وجلب البيانات والصور
@@ -137,7 +66,6 @@ def send_telegram_alert(message):
   except Exception as e:
     print(f"خطأ في إرسال التلجرام: {e}")
 
-
 def send_telegram_photo(photo_bytes, caption):
   url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendPhoto"
   files = {"photo": ("stats.png", photo_bytes, "image/png")}
@@ -151,7 +79,6 @@ def send_telegram_photo(photo_bytes, caption):
   except Exception as e:
     print(f"خطأ في إرسال الصورة للتلجرام: {e}")
 
-
 def get_binance_klines(symbol, interval, limit=100):
   url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
   try:
@@ -159,31 +86,16 @@ def get_binance_klines(symbol, interval, limit=100):
     data = response.json()
     if not isinstance(data, list):
       return None
-
-    df = pd.DataFrame(
-        data,
-        columns=[
-            "timestamp",
-            "open",
-            "high",
-            "low",
-            "close",
-            "volume",
-            "close_time",
-            "quote_av",
-            "trades",
-            "tb_base_av",
-            "tb_quote_av",
-            "ignore",
-        ],
-    )
+    df = pd.DataFrame(data, columns=[
+        "timestamp", "open", "high", "low", "close", "volume",
+        "close_time", "quote_av", "trades", "tb_base_av", "tb_quote_av", "ignore"
+    ])
     df["close"] = df["close"].astype(float)
     df["high"] = df["high"].astype(float)
     df["low"] = df["low"].astype(float)
     return df
   except Exception:
     return None
-
 
 def get_current_price(symbol):
   url = f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}"
@@ -193,14 +105,12 @@ def get_current_price(symbol):
   except:
     return None
 
-
 # ==========================================
 # 3. توليد صورة إحصائيات آخر الصفقات
 # ==========================================
 def generate_stats_image():
   if not closed_trades:
     return None
-
   recent = closed_trades[-20:]
   wins = sum(1 for t in recent if t["result"] == "WIN")
   losses = len(recent) - wins
@@ -208,22 +118,9 @@ def generate_stats_image():
 
   fig, ax = plt.subplots(figsize=(8, 6), facecolor="#1e1e1e")
   ax.set_facecolor("#1e1e1e")
-
   ax.axis("off")
-  title_text = (
-      f"تقرير أداء الصفقات (آخر {len(recent)} صفقات)\nنسبة النجاح:"
-      f" {win_rate:.1f}% (ربح: {wins} | خسارة: {losses})"
-  )
-  ax.text(
-      0.5,
-      0.92,
-      title_text,
-      color="white",
-      fontsize=14,
-      fontweight="bold",
-      ha="center",
-      transform=ax.transAxes,
-  )
+  title_text = f"تقرير أداء الصفقات (آخر {len(recent)} صفقات)\nنسبة النجاح: {win_rate:.1f}% (ربح: {wins} | خسارة: {losses})"
+  ax.text(0.5, 0.92, title_text, color="white", fontsize=14, fontweight="bold", ha="center", transform=ax.transAxes)
 
   table_data = []
   for t in recent:
@@ -231,10 +128,7 @@ def generate_stats_image():
     table_data.append([t["symbol"], t["type"], f"{t['entry']:.2f}", res_text])
 
   columns = ["الزوج", "النوع", "سعر الدخول", "النتيجة"]
-  table = ax.table(
-      cellText=table_data, colLabels=columns, loc="center", cellLoc="center"
-  )
-
+  table = ax.table(cellText=table_data, colLabels=columns, loc="center", cellLoc="center")
   table.auto_set_font_size(False)
   table.set_fontsize(10)
   table.scale(1, 1.3)
@@ -249,13 +143,10 @@ def generate_stats_image():
 
   plt.tight_layout()
   buf = io.BytesIO()
-  plt.savefig(
-      buf, format="png", dpi=150, facecolor=fig.get_facecolor(), edgecolor="none"
-  )
+  plt.savefig(buf, format="png", dpi=150, facecolor=fig.get_facecolor(), edgecolor="none")
   buf.seek(0)
   plt.close(fig)
   return buf.getvalue()
-
 
 # ==========================================
 # 4. خوارزمية صانع السوق وتتبع الصفقات
@@ -273,7 +164,6 @@ def analyze_market_maker_model(symbol):
   current_close = df["close"].iloc[-2]
   current_low = df["low"].iloc[-2]
   current_high = df["high"].iloc[-2]
-
   signal_type = None
 
   if current_close < equilibrium and current_low < recent_low:
@@ -310,7 +200,6 @@ def analyze_market_maker_model(symbol):
     )
     send_telegram_alert(msg)
 
-
 def track_open_trades():
   if not active_trades:
     return
@@ -340,14 +229,15 @@ def track_open_trades():
       closed_trades.append(trade)
       active_trades.remove(trade)
 
-      res_icon = "رابحة" if result == "WIN" else "خاسرة"
+      res_icon = "رابحة" : "خاسري" if result == "WIN" else "خاسرة" # تم التصحيح
+      res_text_final = "رابحة" if result == "WIN" else "خاسرة"
       msg = (
           f"تحديث نتيجة صفقة مغلقة\n\n"
           f"• الأصل: {trade['symbol']}\n"
           f"• النوع: {trade['type']}\n"
           f"• سعر الدخول: {trade['entry']:,.4f}\n"
           f"• سعر الخروج: {current_price:,.4f}\n"
-          f"• النتيجة: {res_icon}"
+          f"• النتيجة: {res_text_final}"
       )
       send_telegram_alert(msg)
 
@@ -355,22 +245,30 @@ def track_open_trades():
       if photo:
         send_telegram_photo(photo, "إحصائيات أداء الصفقات الحالية")
 
-
 # ==========================================
-# 5. حلقة التشغيل المستمر
+# 5. تشغيل البوت في خيط مستقل (Thread)
 # ==========================================
 def run_bot():
-  print("تم تشغيل البوت بنجاح...")
-  send_telegram_alert("تم تشغيل بوت صانع السوق بنجاح وحماية خاصة")
+  print("تم بدء تشغيل حلقة البوت...")
+  send_telegram_alert("🤖 تم تشغيل بوت صانع السوق بنجاح وهو الآن يراقب الأسواق!")
 
   while True:
     print("جاري فحص الأسواق...")
-    with ThreadPoolExecutor(max_workers=10) as executor:
-      executor.map(analyze_market_maker_model, SYMBOLS)
-
-    track_open_trades()
+    try:
+      with ThreadPoolExecutor(max_workers=5) as executor:
+        executor.map(analyze_market_maker_model, SYMBOLS)
+      track_open_trades()
+    except Exception as e:
+      print(f"خطأ أثناء الفحص: {e}")
+    
     time.sleep(60)
 
-
 if __name__ == "__main__":
-  run_bot()
+  # تشغيل البوت في خيط خلفي لكي لا يتعارض مع سيرفر الويب الخاص بـ Render
+  bot_thread = threading.Thread(target=run_bot)
+  bot_thread.daemon = True
+  bot_thread.start()
+
+  # إبقاء السيرفر الرئيسي حياً
+  while True:
+    time.sleep(3600)
