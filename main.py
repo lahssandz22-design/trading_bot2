@@ -11,7 +11,7 @@ from concurrent.futures import ThreadPoolExecutor
 # ==========================================
 # 1. إعدادات البوت والمنصة
 # ==========================================
-TELEGRAM_BOT_TOKEN = "869642227:AAGNB88pBF_kJzEVBLzFQrBGv7yRG5f3Js4" # استبدله بتوكن بوتك الجديد @lahscen11_bot
+TELEGRAM_BOT_TOKEN = "869642227:AAGNB88pBF_kJzEVBLzFQrBGv7yRG5f3Js4" # استبدله بتوكن بوتك الجديد
 TELEGRAM_CHAT_ID = "7895743860"
 
 # قائمة موسعة تضم أكثر من 70 زوجاً وعملة رقمية وفوركس متاحة للمراقبة
@@ -24,14 +24,14 @@ SYMBOLS = [
     "SUIUSDT", "ARBUSDT", "OPUSDT", "INJUSDT", "RNDRUSDT",
     "TIAUSDT", "SEIUSDT", "FETUSDT", "AGIXUSDT", "RENDERUSDT",
     "PEPEUSDT", "SHIBUSDT", "FLOKIUSDT", "BONKUSDT", "WIFUSDT",
-    "NEARUSDT", "ARUSDT", "IMXUSDT", "SANDUSDT", "MANAUSDT",
+    "ARUSDT", "IMXUSDT", "SANDUSDT", "MANAUSDT",
     "AXSUSDT", "GALAUSDT", "CHZUSDT", "CRVUSDT", "AAVEUSDT",
     "MKRUSDT", "SNXUSDT", "COMPUSDT", "LDOUSDT", "RUNEUSDT",
     
     # عملات إضافية لتغطية العدد وزيادة الفرص
     "KASUSDT", "STXUSDT", "ICPUSDT", "ALGOUSDT", "FTMUSDT",
     "HBARUSDT", "VETUSDT", "THETAUSDT", "EGLDUSDT", "EOSUSDT",
-    "XTZUSDT", "KAVAUSDT", "ZILUSDT", "CRVUSDT", "BATUSDT",
+    "XTZUSDT", "KAVAUSDT", "ZILUSDT", "BATUSDT",
     "ENJUSDT", "ZRXUSDT", "IOSTUSDT", "ONTUSDT", "QTUMUSDT"
 ]
 
@@ -239,7 +239,7 @@ def track_open_trades():
 # ==========================================
 # 5. حلقة التشغيل المستمر
 # ==========================================
-def run_bot`:
+def run_bot():
     print(f"✅ تم تشغيل البوت مع أكثر من 70 زوجاً والتتبع الآلي بنجاح...")
     send_telegram_alert(f"🤖 *تم تشغيل بوت صانع السوق (مراقبة 70+ زوج بنجاح)*")
 
